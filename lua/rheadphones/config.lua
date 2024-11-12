@@ -23,3 +23,25 @@ rHeadphones.Config.sounds = {
     playPitch = 100,
     stopPitch = 85
 }
+
+-- Color settings
+rHeadphones.Config.colors = {
+    background = Color(18, 18, 18),
+    header = Color(24, 24, 24),
+    accent = Color(66, 165, 245),
+    text = Color(255, 255, 255),
+    textDark = Color(170, 170, 170),
+    button = Color(38, 38, 38),
+    buttonHover = Color(48, 48, 48),
+    buttonActive = Color(66, 165, 245),
+    searchBg = Color(30, 30, 30),
+    star = Color(255, 193, 7),
+    starInactive = Color(100, 100, 100),
+    success = Color(76, 175, 80),
+    error = Color(244, 67, 54),
+    warning = Color(255, 152, 0),
+    statusBg = Color(24, 24, 24),
+    listBg = Color(24, 24, 24),
+    listHover = Color(38, 38, 38),
+    nowPlaying = Color(66, 165, 245, 100)
+}

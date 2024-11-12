@@ -5,6 +5,7 @@ local isPlaying = false
 local currentVolume = 0.5
 local currentStatus = "STOPPED"
 local currentStationData = nil
+local debugAudio = CreateClientConVar("rheadphones_debug_audio", "0", true, false, "Show audio analysis debug info")
 
 function rHeadphones.CreateChannel()
     if IsValid(rHeadphones.Channel) then
@@ -33,7 +34,22 @@ function rHeadphones.PlayStation(stationData)
             station:Play()
             isPlaying = true
             currentStatus = "PLAYING"
-
+            
+            _G.currentStation = station
+            
+            print("[rHeadphones] Audio channel created:", station)
+            print("[rHeadphones] Channel type:", type(station))
+            
+            concommand.Add("rheadphones_debug_audio", function()
+                if IsValid(station) then
+                    local fft = {}
+                    station:FFT(fft, 6)
+                    PrintTable(fft)
+                else
+                    print("[rHeadphones] No valid audio channel")
+                end
+            end)
+            
             if rHeadphones.Config and rHeadphones.Config.sounds then
                 LocalPlayer():EmitSound(
                     rHeadphones.Config.sounds.play or "items/battery_pickup.wav",
@@ -57,7 +73,6 @@ function rHeadphones.StopPlayback()
         currentStatus = "STOPPED"
         currentStationData = nil
         
-        -- Play sound effect with error handling
         if rHeadphones.Config and rHeadphones.Config.sounds then
             LocalPlayer():EmitSound(
                 rHeadphones.Config.sounds.stop or "items/battery_pickup.wav",
@@ -89,7 +104,8 @@ end)
 function rHeadphones.GetStatus()
     return {
         state = currentStatus,
-        station = currentStationData
+        station = currentStationData,
+        debug = debugAudio:GetBool()
     }
 end
 

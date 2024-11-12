@@ -2,6 +2,26 @@ rHeadphones = rHeadphones or {}
 rHeadphones.Config = rHeadphones.Config or {}
 rHeadphones.Stations = rHeadphones.Stations or {}
 
+surface.CreateFont("rHeadphones_Title", {
+    font = "Roboto",
+    size = 28,
+    weight = 700
+})
+
+surface.CreateFont("rHeadphones_Regular", {
+    font = "Roboto",
+    size = 20,
+    weight = 400
+})
+
+surface.CreateFont("rHeadphones_Small", {
+    font = "Roboto",
+    size = 16,
+    weight = 400
+})
+
+include("rheadphones/lib/sound_analyze.lua")
+
 function rHeadphones.FormatCountryName(name)
     name = name:gsub("_", " ")
     
@@ -43,22 +63,50 @@ rHeadphones.Config = { -- Default config in-case anything goes wrong with config
     }
 }
 
+local function StripCountrySuffix(country)
+    return string.gsub(country, "_%d+$", "")
+end
+
 local function LoadStationData()
     local files, _ = file.Find("rheadphones/stations/data_*.lua", "LUA")
+    local tempStations = {}
     
+    -- First pass: Load all data into temporary table
     for _, f in ipairs(files) do
         local stationData = include("rheadphones/stations/" .. f)
         for country, stations in pairs(stationData) do
-            rHeadphones.Stations[country] = rHeadphones.Stations[country] or {}
+            -- Strip any numeric suffix from country name
+            local cleanCountry = StripCountrySuffix(country)
+            tempStations[cleanCountry] = tempStations[cleanCountry] or {}
 
             for _, station in ipairs(stations) do
-                table.insert(rHeadphones.Stations[country], {
+                table.insert(tempStations[cleanCountry], {
                     name = station.n,
                     url = station.u,
-                    country = country
+                    country = cleanCountry
                 })
             end
         end
+    end
+    
+    -- Second pass: Remove duplicates and sort
+    for country, stations in pairs(tempStations) do
+        local seen = {}
+        local uniqueStations = {}
+        
+        for _, station in ipairs(stations) do
+            local key = station.name .. station.url
+            if not seen[key] then
+                seen[key] = true
+                table.insert(uniqueStations, station)
+            end
+        end
+        
+        table.sort(uniqueStations, function(a, b)
+            return a.name < b.name
+        end)
+
+        rHeadphones.Stations[country] = uniqueStations
     end
 end
 
