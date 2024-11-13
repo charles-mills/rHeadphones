@@ -68,45 +68,24 @@ local function StripCountrySuffix(country)
 end
 
 local function LoadStationData()
-    local files, _ = file.Find("rheadphones/stations/data_*.lua", "LUA")
-    local tempStations = {}
-    
-    -- First pass: Load all data into temporary table
-    for _, f in ipairs(files) do
-        local stationData = include("rheadphones/stations/" .. f)
-        for country, stations in pairs(stationData) do
-            -- Strip any numeric suffix from country name
-            local cleanCountry = StripCountrySuffix(country)
-            tempStations[cleanCountry] = tempStations[cleanCountry] or {}
+    local stationData = include("rheadphones/stations.lua")
 
-            for _, station in ipairs(stations) do
-                table.insert(tempStations[cleanCountry], {
-                    name = station.n,
-                    url = station.u,
-                    country = cleanCountry
-                })
-            end
-        end
-    end
-    
-    -- Second pass: Remove duplicates and sort
-    for country, stations in pairs(tempStations) do
-        local seen = {}
-        local uniqueStations = {}
-        
+    for country, stations in pairs(stationData) do
+        local cleanCountry = StripCountrySuffix(country)
+        rHeadphones.Stations[cleanCountry] = rHeadphones.Stations[cleanCountry] or {}
+
         for _, station in ipairs(stations) do
-            local key = station.name .. station.url
-            if not seen[key] then
-                seen[key] = true
-                table.insert(uniqueStations, station)
-            end
+            table.insert(rHeadphones.Stations[cleanCountry], {
+                name = station.n,
+                url = station.u,
+                country = cleanCountry
+            })
         end
         
-        table.sort(uniqueStations, function(a, b)
+        -- Sort stations by name
+        table.sort(rHeadphones.Stations[cleanCountry], function(a, b)
             return a.name < b.name
         end)
-
-        rHeadphones.Stations[country] = uniqueStations
     end
 end
 

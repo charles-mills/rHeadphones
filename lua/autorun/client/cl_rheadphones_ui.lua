@@ -232,7 +232,6 @@ end
 function PANEL:InitializeStatusPanel()
     if IsValid(self.status) then
         if self.analyzer then
-        if self.analyzer then
             if type(self.analyzer.Remove) == "function" then
                 self.analyzer:Remove()
             end
@@ -441,7 +440,7 @@ function PANEL:InitializeStatusPanel()
                 draw.SimpleText(
                     formattedCountry,
                     "rHeadphones_Regular",
-                    w - 20,
+                    w - 80,
                     h/2 + 15,
                     ColorAlpha(COLORS.textDark, countryAlpha),
                     TEXT_ALIGN_RIGHT,
